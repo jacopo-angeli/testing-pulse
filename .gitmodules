@@ -1,0 +1,3 @@
+[submodule "pulse-tutorial-24"]
+	path = pulse-tutorial-24
+	url = git@github.com:FStarLang/pulse-tutorial-24.git

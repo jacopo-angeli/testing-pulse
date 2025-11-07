@@ -1,12 +1,14 @@
+
 FSTAR_FILES := $(wildcard *.fst)
 FSTAR_EXE := fstar.exe
-PULSE := ../../pulse/lib/pulse
+EXTRACTED_DIR := extracted
+
 
 all: verify
 
 verify: $(FSTAR_FILES:.fst=.verified)
 
 %.verified: %.fst
-	$(FSTAR_EXE) $(basename $@).fst --include $(PULSE)
+	$(FSTAR_EXE) $(basename $@).fst
 
-.PHONY: all verify
+.PHONY: all verify 
