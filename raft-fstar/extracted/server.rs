@@ -13,6 +13,15 @@ pub fn extract_term(arr: &mut [u8], p: (), s: ()) -> u32 {
         + super::fstar_uint8::v(b2) * 256 + super::fstar_uint8::v(b3);
     super::fstar_uint32::uint_to_t(v_nat)
 }
+pub fn extract_leader_id(arr: &mut [u8], p: (), s: ()) -> u32 {
+    let b0 = super::pulse_lib_array_ptsto::op_Array_Access(arr, 0, (), ());
+    let b1 = super::pulse_lib_array_ptsto::op_Array_Access(arr, 1, (), ());
+    let b2 = super::pulse_lib_array_ptsto::op_Array_Access(arr, 2, (), ());
+    let b3 = super::pulse_lib_array_ptsto::op_Array_Access(arr, 3, (), ());
+    let v_nat = super::fstar_uint8::v(b0) * 16777216 + super::fstar_uint8::v(b1) * 65536
+        + super::fstar_uint8::v(b2) * 256 + super::fstar_uint8::v(b3);
+    super::fstar_uint32::uint_to_t(v_nat)
+}
 #[derive(Debug, Clone, PartialEq)]
 pub enum raft_state {
     Follower,
@@ -20,6 +29,9 @@ pub enum raft_state {
     Leader,
 }
 #[derive(Debug)]
+pub struct server_config {
+    pub default_leader: std::option::Option<u32>,
+}
 pub struct server_state {
     pub current_term: u32,
     pub state: super::server::raft_state,
@@ -27,18 +39,116 @@ pub struct server_state {
     pub commit_index: u32,
     pub previous_log_index: u32,
 }
+pub struct server {
+    pub id: u32,
+    pub state1: super::server::server_state,
+    pub config: super::server::server_config,
+}
 pub fn handle_heartbeat(
-    s: &mut super::server::server_state,
+    s: &mut super::server::server,
     data: &mut [u8],
     p_s: (),
     p_data: (),
     st: (),
     s_seq: (),
-    st1: (),
 ) -> () {
-    let st2 = super::pulse_lib_reference::op_Bang(s, (), ());
-    if st2.state == super::server::raft_state::Leader {
+    let server1 = super::pulse_lib_reference::op_Bang(s, (), ());
+    if server1.state1.state == super::server::raft_state::Leader {
         let term = super::server::extract_term(data, (), ());
+        if server1.state1.current_term > term {
+            super::pulse_lib_reference::op_Colon_Equals(
+                s,
+                super::server::server {
+                    id: server1.id,
+                    state1: {
+                        let uu___1 = server1.state1;
+                        super::server::server_state {
+                            current_term: uu___1.current_term,
+                            state: super::server::raft_state::Follower,
+                            voted_for: uu___1.voted_for,
+                            commit_index: uu___1.commit_index,
+                            previous_log_index: uu___1.previous_log_index,
+                        }
+                    },
+                    config: server1.config,
+                },
+                (),
+            )
+        } else {
+            ()
+        };
+        if super::fstar_uint32::eq(server1.state1.current_term, term) {
+            let leader_id = super::server::extract_leader_id(data, (), ());
+            match server1.config.default_leader {
+                None => {
+                    if server1.id < leader_id {
+                        super::pulse_lib_reference::op_Colon_Equals(
+                            s,
+                            super::server::server {
+                                id: server1.id,
+                                state1: {
+                                    let uu___1 = server1.state1;
+                                    super::server::server_state {
+                                        current_term: term,
+                                        state: super::server::raft_state::Follower,
+                                        voted_for: uu___1.voted_for,
+                                        commit_index: uu___1.commit_index,
+                                        previous_log_index: uu___1.previous_log_index,
+                                    }
+                                },
+                                config: server1.config,
+                            },
+                            (),
+                        )
+                    } else {
+                        ()
+                    }
+                }
+                Some(mut x) => {
+                    if super::fstar_uint32::ne(server1.id, x) {
+                        super::pulse_lib_reference::op_Colon_Equals(
+                            s,
+                            super::server::server {
+                                id: server1.id,
+                                state1: {
+                                    let uu___1 = server1.state1;
+                                    super::server::server_state {
+                                        current_term: term,
+                                        state: super::server::raft_state::Follower,
+                                        voted_for: uu___1.voted_for,
+                                        commit_index: uu___1.commit_index,
+                                        previous_log_index: uu___1.previous_log_index,
+                                    }
+                                },
+                                config: server1.config,
+                            },
+                            (),
+                        )
+                    } else {
+                        super::pulse_lib_reference::op_Colon_Equals(
+                            s,
+                            super::server::server {
+                                id: server1.id,
+                                state1: {
+                                    let uu___1 = server1.state1;
+                                    super::server::server_state {
+                                        current_term: uu___1.current_term,
+                                        state: super::server::raft_state::Leader,
+                                        voted_for: uu___1.voted_for,
+                                        commit_index: uu___1.commit_index,
+                                        previous_log_index: uu___1.previous_log_index,
+                                    }
+                                },
+                                config: server1.config,
+                            },
+                            (),
+                        )
+                    }
+                }
+            }
+        } else {
+            ()
+        }
     } else {
         ()
     }
