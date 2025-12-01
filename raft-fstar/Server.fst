@@ -80,10 +80,10 @@ fn handle_heartbeat
   (data: array U8.t)
   (#p_s: Pulse.Lib.Pervasives.perm)
   (#p_data: Pulse.Lib.Pervasives.perm)
-  (#st: Pulse.Lib.Pervasives.erased server_state)
+  (#st: Pulse.Lib.Pervasives.erased server)
   (#s_seq: Pulse.Lib.Pervasives.erased (Seq.seq U8.t))
 requires 
-  (exists* st. Pulse.Lib.Pervasives.pts_to s st) **
+  Pulse.Lib.Pervasives.pts_to s st **
   Pulse.Lib.Array.pts_to data #p_data s_seq **
   pure (Seq.length s_seq > 7)
 returns unit
@@ -97,36 +97,40 @@ ensures
     let term = extract_term data;
     
     if (U32.gt server.state.current_term term){
-      s :=  { server with state = { server.state with state = Follower} }
+      s :=  { server with 
+               state = { server.state with 
+                 state = Follower} }
     };
 
-    if (U32.eq server.state.current_term term){
+    if (U32.eq server.state.current_term term) {
       let leader_id = extract_leader_id data;
 
       match server.config.default_leader {
-        | None -> {
-          if (U32.le server.id leader_id){
+        None -> {
+          if (U32.lt server.id leader_id){
             s :=  { 
                     server with 
-                      state = { server.state with state = Follower};
-                      current_term = term
+                      state = { server.state with 
+                        state = Follower; 
+                        current_term = term};
                   }
           }
         }
-        | Some x -> {
+        Some x -> {
           if (U32.ne server.id x){
             s :=  { 
                     server with 
-                      state = { server.state with state = Follower};
-                      current_term = term
+                      state = { server.state with 
+                        state = Follower; 
+                        current_term = term };
                   }
-          }else{
-            s :=  { server with state = { server.state with state = Leader} }
+          } else {
+            s := { server with 
+                    state = { server.state with 
+                      state = Leader} }
           }
         }
       }
     }
-  };
-  // ? self.state.last_heartbeat = Instant::now(); 
-  ()
+  }
 }
