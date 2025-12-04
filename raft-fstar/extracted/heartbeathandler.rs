@@ -34,18 +34,18 @@ pub struct server_config {
 }
 pub struct server_state {
     pub current_term: u32,
-    pub state: super::server::raft_state,
+    pub state: super::heartbeathandler::raft_state,
     pub voted_for: std::option::Option<u32>,
     pub commit_index: u32,
     pub previous_log_index: u32,
 }
 pub struct server {
     pub id: u32,
-    pub state1: super::server::server_state,
-    pub config: super::server::server_config,
+    pub state1: super::heartbeathandler::server_state,
+    pub config: super::heartbeathandler::server_config,
 }
 pub fn handle_heartbeat(
-    s: &mut super::server::server,
+    s: &mut super::heartbeathandler::server,
     data: &mut [u8],
     p_s: (),
     p_data: (),
@@ -53,18 +53,18 @@ pub fn handle_heartbeat(
     s_seq: (),
 ) -> () {
     let server1 = super::pulse_lib_reference::op_Bang(s, (), ());
-    if server1.state1.state == super::server::raft_state::Leader {
-        let term = super::server::extract_term(data, (), ());
+    if server1.state1.state == super::heartbeathandler::raft_state::Leader {
+        let term = super::heartbeathandler::extract_term(data, (), ());
         if server1.state1.current_term > term {
             super::pulse_lib_reference::op_Colon_Equals(
                 s,
-                super::server::server {
+                super::heartbeathandler::server {
                     id: server1.id,
                     state1: {
                         let uu___1 = server1.state1;
-                        super::server::server_state {
+                        super::heartbeathandler::server_state {
                             current_term: uu___1.current_term,
-                            state: super::server::raft_state::Follower,
+                            state: super::heartbeathandler::raft_state::Follower,
                             voted_for: uu___1.voted_for,
                             commit_index: uu___1.commit_index,
                             previous_log_index: uu___1.previous_log_index,
@@ -78,19 +78,19 @@ pub fn handle_heartbeat(
             ()
         };
         if super::fstar_uint32::eq(server1.state1.current_term, term) {
-            let leader_id = super::server::extract_leader_id(data, (), ());
+            let leader_id = super::heartbeathandler::extract_leader_id(data, (), ());
             match server1.config.default_leader {
                 None => {
                     if server1.id < leader_id {
                         super::pulse_lib_reference::op_Colon_Equals(
                             s,
-                            super::server::server {
+                            super::heartbeathandler::server {
                                 id: server1.id,
                                 state1: {
                                     let uu___1 = server1.state1;
-                                    super::server::server_state {
+                                    super::heartbeathandler::server_state {
                                         current_term: term,
-                                        state: super::server::raft_state::Follower,
+                                        state: super::heartbeathandler::raft_state::Follower,
                                         voted_for: uu___1.voted_for,
                                         commit_index: uu___1.commit_index,
                                         previous_log_index: uu___1.previous_log_index,
@@ -108,13 +108,13 @@ pub fn handle_heartbeat(
                     if super::fstar_uint32::ne(server1.id, x) {
                         super::pulse_lib_reference::op_Colon_Equals(
                             s,
-                            super::server::server {
+                            super::heartbeathandler::server {
                                 id: server1.id,
                                 state1: {
                                     let uu___1 = server1.state1;
-                                    super::server::server_state {
+                                    super::heartbeathandler::server_state {
                                         current_term: term,
-                                        state: super::server::raft_state::Follower,
+                                        state: super::heartbeathandler::raft_state::Follower,
                                         voted_for: uu___1.voted_for,
                                         commit_index: uu___1.commit_index,
                                         previous_log_index: uu___1.previous_log_index,
@@ -127,13 +127,13 @@ pub fn handle_heartbeat(
                     } else {
                         super::pulse_lib_reference::op_Colon_Equals(
                             s,
-                            super::server::server {
+                            super::heartbeathandler::server {
                                 id: server1.id,
                                 state1: {
                                     let uu___1 = server1.state1;
-                                    super::server::server_state {
+                                    super::heartbeathandler::server_state {
                                         current_term: uu___1.current_term,
-                                        state: super::server::raft_state::Leader,
+                                        state: super::heartbeathandler::raft_state::Leader,
                                         voted_for: uu___1.voted_for,
                                         commit_index: uu___1.commit_index,
                                         previous_log_index: uu___1.previous_log_index,

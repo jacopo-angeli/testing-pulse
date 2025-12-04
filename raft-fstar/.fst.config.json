@@ -1,0 +1,30 @@
+{
+  "fstar_exe": "fstar.exe",
+  "options": [
+    "--include",
+    "$PULSE_HOME",
+    "--cache_dir",
+    ".cache",
+    "--no_location_info",
+    "--warn_error",
+    "-271-272-241-319-274"
+  ],
+  "include_dirs": [
+    "../ulib",
+    "basic",
+    "basic/boot",
+    "extraction",
+    "fstar",
+    "parser",
+    "prettyprint",
+    "prettyprint/boot",
+    "reflection",
+    "smtencoding",
+    "syntax",
+    "tactics",
+    "tosyntax",
+    "typechecker",
+    "tests",
+    "tests/boot"
+  ]
+}

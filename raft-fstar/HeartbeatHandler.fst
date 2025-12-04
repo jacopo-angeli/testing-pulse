@@ -1,4 +1,4 @@
-module Server
+module HeartbeatHandler
 #lang-pulse
 
 open Pulse.Lib.Pervasives
