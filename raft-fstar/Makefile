@@ -5,9 +5,9 @@ EXTRACTED_DIR := extracted
 CACHE_DIR 	:= .cache
 
 FLAGS 		:=
-FLAGS		+= --z3version 4.13.3
+FLAGS			+= --z3version 4.13.3
 FLAGS 		+= --cache_checked_modules --cache_dir $(CACHE_DIR)
-FLAGS 		+= --include $(PULSE_HOME)
+FLAGS 		+= --include $(PULSE_HOME)/out/lib/pulse
 
 %.fst-in %.fsti-in: FLAGS += --odir $(CACHE_DIR)
 %.fst-in %.fsti-in:
